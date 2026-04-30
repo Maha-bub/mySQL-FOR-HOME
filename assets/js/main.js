@@ -1,44 +1,77 @@
 // =============================================
-//  main.js — JavaScript Helpers
+//  main.js — Sidebar + UI helpers
 // =============================================
 
-// Confirm before deleting a product
+/* ── SIDEBAR TOGGLE (mobile) ── */
+function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+/* ── DELETE CONFIRM ── */
 function confirmDelete(id, name) {
-    if (confirm("⚠️ Delete \"" + name + "\"?\n\nThis cannot be undone.")) {
-        window.location.href = "delete.php?id=" + id;
+    if (confirm('⚠️ Delete "' + name + '"?\n\nThis action cannot be undone.')) {
+        window.location.href = 'delete.php?id=' + id;
     }
 }
 
-// Auto-hide alerts after 4 seconds
-document.addEventListener("DOMContentLoaded", function () {
-    const alerts = document.querySelectorAll(".alert");
-    alerts.forEach(function (alert) {
+/* ── AUTO-HIDE ALERTS ── */
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Auto-dismiss alerts after 4 seconds
+    document.querySelectorAll('.alert').forEach(function (el) {
         setTimeout(function () {
-            alert.style.transition = "opacity 0.5s";
-            alert.style.opacity = "0";
-            setTimeout(function () { alert.remove(); }, 500);
+            el.style.transition = 'opacity 0.5s';
+            el.style.opacity    = '0';
+            setTimeout(function () { el.remove(); }, 500);
         }, 4000);
     });
 
-    // Preview image before uploading
-    const imageInput = document.getElementById("image");
-    if (imageInput) {
-        imageInput.addEventListener("change", function () {
+    // ── IMAGE UPLOAD PREVIEW ──
+    const fileInput = document.getElementById('image-upload');
+    if (fileInput) {
+        fileInput.addEventListener('change', function () {
             const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    let preview = document.getElementById("img-preview");
-                    if (!preview) {
-                        preview = document.createElement("img");
-                        preview.id = "img-preview";
-                        preview.style.cssText = "width:80px;height:80px;object-fit:cover;border-radius:10px;margin-top:10px;border:1px solid #2a2a3a;display:block;";
-                        imageInput.parentNode.appendChild(preview);
-                    }
-                    preview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                let preview = document.getElementById('img-preview');
+                const box   = document.getElementById('img-preview-box');
+
+                if (!preview) {
+                    preview    = document.createElement('img');
+                    preview.id = 'img-preview';
+                }
+                preview.src = e.target.result;
+
+                if (box) {
+                    box.style.display = 'flex';
+                    const existing    = box.querySelector('img');
+                    if (existing) existing.src = e.target.result;
+                    else box.prepend(preview);
+                }
+
+                // Update label text
+                const label = document.querySelector('.file-input-text');
+                if (label) label.innerHTML = '<strong>' + file.name + '</strong>';
+            };
+            reader.readAsDataURL(file);
         });
+
+        // Clicking the wrapper triggers file picker
+        const wrapper = document.querySelector('.file-input-wrapper');
+        if (wrapper) {
+            wrapper.addEventListener('click', function () {
+                fileInput.click();
+            });
+        }
     }
 });

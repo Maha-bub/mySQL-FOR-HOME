@@ -1,168 +1,152 @@
 <?php
-// =============================================
-//  view.php — Show All Products
-// =============================================
-
 include 'db.php';
 
-// Search functionality
+$page_title = "All Products";
+
+// ── Search & Filter ──
 $search = "";
-if (isset($_GET['search']) && !empty(trim($_GET['search']))) {
+$filter = $_GET['filter'] ?? '';
+
+if (!empty(trim($_GET['search'] ?? ''))) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
     $sql    = "SELECT * FROM products WHERE name LIKE '%$search%' OR category LIKE '%$search%' ORDER BY id DESC";
+} elseif ($filter === 'low') {
+    $sql = "SELECT * FROM products WHERE quantity <= 5 ORDER BY quantity ASC";
 } else {
-    $sql    = "SELECT * FROM products ORDER BY id DESC";
+    $sql = "SELECT * FROM products ORDER BY id DESC";
 }
 
 $result = mysqli_query($conn, $sql);
 $count  = mysqli_num_rows($result);
 
-// Check for success/error messages from other pages
 $msg     = $_GET['msg']  ?? '';
 $msgType = $_GET['type'] ?? '';
+
+include 'sidebar.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All Products — Product Manager</title>
-  <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
 
-<nav class="navbar">
-  <a href="index.php" class="brand">📦 ProductMgr <span>BETA</span></a>
-  <div class="nav-links">
-    <a href="index.php">🏠 Dashboard</a>
-    <a href="view.php" class="active">📋 Products</a>
-    <a href="insert.php">➕ Add New</a>
-  </div>
-</nav>
-
-<div class="container">
-
-  <div class="page-header">
-    <h1>All Products</h1>
-    <p>Showing <?= $count ?> product<?= $count != 1 ? 's' : '' ?>
-       <?= $search ? "for \"$search\"" : "in inventory" ?></p>
-  </div>
-
-  <!-- ALERT MESSAGES -->
-  <?php if ($msg): ?>
-    <div class="alert alert-<?= $msgType == 'success' ? 'success' : 'error' ?>">
-      <?= $msgType == 'success' ? '✅' : '❌' ?> <?= htmlspecialchars($msg) ?>
-    </div>
-  <?php endif; ?>
-
-  <div class="table-wrapper">
-    <!-- TOOLBAR with search + add button -->
-    <div class="table-toolbar">
-      <h2>📋 Product List</h2>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <!-- Search Form -->
-        <form method="GET" style="display:flex; gap:8px;">
-          <input type="text"
-                 name="search"
-                 placeholder="Search products..."
-                 value="<?= htmlspecialchars($search) ?>"
-                 style="background:#0e0e12; border:1px solid #2a2a3a; border-radius:8px; padding:8px 14px; color:#e8e8f0; font-size:0.88rem; outline:none; width:200px;">
-          <button type="submit" class="btn btn-outline btn-sm">🔍</button>
-          <?php if ($search): ?>
-            <a href="view.php" class="btn btn-outline btn-sm">✕ Clear</a>
-          <?php endif; ?>
-        </form>
-        <a href="insert.php" class="btn btn-primary btn-sm">➕ Add Product</a>
-      </div>
-    </div>
-
-    <?php if ($count > 0): ?>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Image</th>
-          <th>Product Name</th>
-          <th>Category</th>
-          <th>Price</th>
-          <th>Quantity</th>
-          <th>Description</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php
-        $i = 1;
-        while ($row = mysqli_fetch_assoc($result)):
-        ?>
-        <tr>
-          <td style="color:var(--muted); font-size:0.8rem;"><?= $i++ ?></td>
-
-          <!-- Image -->
-          <td>
-            <?php if (!empty($row['image']) && file_exists("uploads/" . $row['image'])): ?>
-              <img src="uploads/<?= htmlspecialchars($row['image']) ?>" class="product-img" alt="">
-            <?php else: ?>
-              <div class="product-img-placeholder">📦</div>
-            <?php endif; ?>
-          </td>
-
-          <!-- Name -->
-          <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
-
-          <!-- Category -->
-          <td><span class="badge badge-purple"><?= htmlspecialchars($row['category'] ?? 'N/A') ?></span></td>
-
-          <!-- Price -->
-          <td><strong style="color:var(--green);">৳<?= number_format($row['price'], 2) ?></strong></td>
-
-          <!-- Quantity -->
-          <td>
-            <?php
-              $qty = $row['quantity'];
-              if ($qty == 0) {
-                  echo '<span class="badge badge-red">Out of Stock</span>';
-              } elseif ($qty <= 5) {
-                  echo '<span class="badge badge-yellow">Low: ' . $qty . '</span>';
-              } else {
-                  echo '<span class="badge badge-green">' . $qty . ' units</span>';
-              }
-            ?>
-          </td>
-
-          <!-- Description (truncated) -->
-          <td style="max-width:200px; color:var(--muted); font-size:0.85rem;">
-            <?= htmlspecialchars(substr($row['description'] ?? '', 0, 60)) ?>
-            <?= strlen($row['description'] ?? '') > 60 ? '...' : '' ?>
-          </td>
-
-          <!-- Actions -->
-          <td>
-            <div class="actions">
-              <a href="edit.php?id=<?= $row['id'] ?>" class="btn btn-outline btn-sm">✏️ Edit</a>
-              <button onclick="confirmDelete(<?= $row['id'] ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>')"
-                      class="btn btn-danger btn-sm">🗑️ Delete</button>
-            </div>
-          </td>
-        </tr>
-        <?php endwhile; ?>
-      </tbody>
-    </table>
-
+<!-- HEADER -->
+<div class="page-header">
+  <h2><?= $filter === 'low' ? '⚠️ Low Stock Products' : 'All Products' ?></h2>
+  <p>
+    <?php if ($search): ?>
+      <?= $count ?> result<?= $count!=1?'s':'' ?> for "<strong><?= htmlspecialchars($search) ?></strong>"
+    <?php elseif ($filter === 'low'): ?>
+      Products with 5 or fewer units remaining
     <?php else: ?>
-      <div class="empty-state">
-        <div class="icon"><?= $search ? '🔍' : '📭' ?></div>
-        <h3><?= $search ? "No results found" : "No products yet" ?></h3>
-        <p><?= $search ? "Try a different search term." : "Add your first product to get started." ?></p>
-        <?php if (!$search): ?>
-          <a href="insert.php" class="btn btn-primary">➕ Add First Product</a>
-        <?php endif; ?>
-      </div>
+      <?= $count ?> product<?= $count!=1?'s':'' ?> in your inventory
     <?php endif; ?>
-
-  </div>
+  </p>
 </div>
 
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+<!-- ALERT -->
+<?php if ($msg): ?>
+  <div class="alert alert-<?= $msgType === 'success' ? 'success' : 'error' ?>">
+    <?= $msgType === 'success' ? '✅' : '❌' ?> <?= htmlspecialchars($msg) ?>
+  </div>
+<?php endif; ?>
+
+<!-- TABLE CARD -->
+<div class="table-card">
+  <div class="table-toolbar">
+    <span class="table-toolbar-title">📋 Product List</span>
+    <div class="toolbar-actions">
+
+      <!-- Search -->
+      <form method="GET" style="display:flex;gap:8px;align-items:center;">
+        <input type="text"
+               name="search"
+               class="search-input"
+               placeholder="Search name or category…"
+               value="<?= htmlspecialchars($search) ?>">
+        <button type="submit" class="btn btn-ghost btn-sm">🔍</button>
+        <?php if ($search || $filter): ?>
+          <a href="view.php" class="btn btn-ghost btn-sm">✕ Clear</a>
+        <?php endif; ?>
+      </form>
+
+      <a href="insert.php" class="btn btn-primary btn-sm">➕ Add Product</a>
+    </div>
+  </div>
+
+  <?php if ($count > 0): ?>
+  <div style="overflow-x:auto;">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Image</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php $i=1; while ($row = mysqli_fetch_assoc($result)): ?>
+      <tr>
+        <td class="row-num"><?= $i++ ?></td>
+        <td>
+          <?php if (!empty($row['image']) && file_exists("uploads/".$row['image'])): ?>
+            <img src="uploads/<?= htmlspecialchars($row['image']) ?>" class="product-thumb" alt="">
+          <?php else: ?>
+            <div class="product-placeholder">📦</div>
+          <?php endif; ?>
+        </td>
+        <td class="product-name-cell">
+          <strong><?= htmlspecialchars($row['name']) ?></strong>
+        </td>
+        <td><span class="badge badge-purple"><?= htmlspecialchars($row['category'] ?? '—') ?></span></td>
+        <td class="price-text">৳<?= number_format($row['price'],2) ?></td>
+        <td>
+          <?php
+            $q = (int)$row['quantity'];
+            if ($q === 0)    echo '<span class="badge badge-red">Out of Stock</span>';
+            elseif ($q <= 5) echo '<span class="badge badge-yellow">Low: '.$q.'</span>';
+            else             echo '<span class="badge badge-green">'.$q.' units</span>';
+          ?>
+        </td>
+        <td style="max-width:180px; color:var(--muted); font-size:0.82rem;">
+          <?= htmlspecialchars(substr($row['description'] ?? '', 0, 55)) ?>
+          <?= strlen($row['description'] ?? '') > 55 ? '…' : '' ?>
+        </td>
+        <td>
+          <div class="actions">
+            <a href="edit.php?id=<?= $row['id'] ?>" class="btn btn-outline btn-sm">✏️ Edit</a>
+            <button onclick="confirmDelete(<?= $row['id'] ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>')"
+                    class="btn btn-danger btn-sm">🗑️</button>
+          </div>
+        </td>
+      </tr>
+      <?php endwhile; ?>
+    </tbody>
+  </table>
+  </div>
+
+  <?php else: ?>
+    <div class="empty-state">
+      <div class="empty-icon"><?= $search ? '🔍' : ($filter === 'low' ? '✅' : '📭') ?></div>
+      <h3>
+        <?php
+          if ($search)          echo "No results found";
+          elseif ($filter==='low') echo "No low-stock products!";
+          else                  echo "No products yet";
+        ?>
+      </h3>
+      <p>
+        <?php
+          if ($search)          echo "Try a different keyword.";
+          elseif ($filter==='low') echo "All products have sufficient stock.";
+          else                  echo "Add your first product to the inventory.";
+        ?>
+      </p>
+      <?php if (!$search && !$filter): ?>
+        <a href="insert.php" class="btn btn-primary">➕ Add First Product</a>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
+</div>
+
+<?php include 'footer.php'; ?>

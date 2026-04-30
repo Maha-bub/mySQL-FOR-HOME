@@ -1,34 +1,30 @@
 <?php
 // =============================================
 //  db.php — Database Connection
-//  Beginner-friendly with comments!
 // =============================================
 
-$host     = "localhost";   // Where MySQL is running
-$username = "root";        // Default XAMPP username
-$password = "";            // Default XAMPP password (empty)
-$database = "product_db";  // The database we created
+$host     = "localhost";
+$username = "root";
+$password = "";
+$database = "product_db";
 
-// Connect to MySQL
 $conn = mysqli_connect($host, $username, $password, $database);
 
-// Check if connection worked
 if (!$conn) {
     die("
-    <div style='font-family:sans-serif; padding:30px; background:#fff0f0; border:2px solid red; margin:20px; border-radius:8px;'>
-        <h2>❌ Database Connection Failed!</h2>
-        <p><strong>Error:</strong> " . mysqli_connect_error() . "</p>
-        <hr>
-        <h3>🔧 How to fix this:</h3>
-        <ol>
-            <li>Open <strong>XAMPP Control Panel</strong></li>
-            <li>Make sure <strong>MySQL is running</strong> (green light)</li>
-            <li>Make sure you created the database <code>product_db</code> in phpMyAdmin</li>
+    <div style='font-family:sans-serif;padding:40px;background:#13131c;color:#f54b4b;border:1px solid #f54b4b;margin:40px;border-radius:12px;'>
+        <h2>❌ Database Connection Failed</h2>
+        <p style='margin-top:10px;color:#dddde8;'>" . mysqli_connect_error() . "</p>
+        <hr style='border-color:#252535;margin:20px 0;'>
+        <ol style='color:#6e6e8a;line-height:2;'>
+            <li>Open XAMPP Control Panel</li>
+            <li>Start <strong style='color:#dddde8;'>Apache</strong> and <strong style='color:#dddde8;'>MySQL</strong></li>
+            <li>Go to <code style='color:#7c6dfa;'>http://localhost/phpmyadmin</code></li>
+            <li>Create database: <code style='color:#7c6dfa;'>product_db</code></li>
         </ol>
     </div>
     ");
 }
 
-// Set character encoding to UTF-8 (supports all languages)
 mysqli_set_charset($conn, "utf8");
 ?>
