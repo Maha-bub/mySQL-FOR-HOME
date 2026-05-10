@@ -1,0 +1,8 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# Block direct access to includes subfolder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^includes/ - [F,L]
+</IfModule>

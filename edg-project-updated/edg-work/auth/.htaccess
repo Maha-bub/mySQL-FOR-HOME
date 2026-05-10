@@ -1,0 +1,5 @@
+Options -Indexes
+DirectoryIndex login.php
+
+# Block direct access to logout (must go via link, not URL bar)
+# Anyone can visit login/register

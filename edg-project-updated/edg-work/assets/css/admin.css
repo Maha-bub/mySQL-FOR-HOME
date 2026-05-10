@@ -1,0 +1,286 @@
+/* ============================================================
+   admin.css — Esho Desh Gori Admin Panel
+   ============================================================ */
+:root {
+  --sidebar-w: 240px;
+  --sidebar-collapsed-w: 68px;
+  --green:   #1a7a4a;
+  --green-dk:#0f5432;
+  --gold:    #d4a017;
+  --topbar-h:60px;
+  --bg:      #f4f7f5;
+  --sidebar-bg: #111e17;
+  --sidebar-text: rgba(255,255,255,.70);
+  --sidebar-hover: rgba(255,255,255,.07);
+  --sidebar-active-bg: rgba(26,122,74,.30);
+  --sidebar-active-border: #1a7a4a;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); font-family: 'Segoe UI', sans-serif; display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  z-index: 200;
+  transition: width .25s ease;
+  overflow: hidden;
+}
+.sidebar.collapsed { width: var(--sidebar-collapsed-w); }
+.sidebar.collapsed .sidebar-brand span,
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .badge-count { display: none; }
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 18px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  white-space: nowrap;
+}
+.sidebar-brand i { font-size: 22px; color: var(--gold); flex-shrink: 0; }
+
+.sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all .18s;
+  margin-bottom: 2px;
+  position: relative;
+}
+.nav-item i { width: 20px; text-align: center; flex-shrink: 0; font-size: 15px; }
+.nav-item:hover { background: var(--sidebar-hover); color: #fff; }
+.nav-item.active {
+  background: var(--sidebar-active-bg);
+  color: #fff;
+  border-left: 3px solid var(--sidebar-active-border);
+  padding-left: 9px;
+}
+.badge-count {
+  margin-left: auto;
+  background: #e11d48;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+.text-danger-soft { color: #f87171 !important; }
+.sidebar-footer { padding: 8px; border-top: 1px solid rgba(255,255,255,.06); }
+
+/* ── MAIN WRAP ── */
+.main-wrap {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left .25s ease;
+}
+.sidebar.collapsed ~ .main-wrap { margin-left: var(--sidebar-collapsed-w); }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: #fff;
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+  border-bottom: 1px solid #e8f0ec;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover { background: #f0faf4; }
+.topbar-title { font-size: 17px; font-weight: 600; color: #111; flex: 1; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.admin-badge {
+  background: #e8f5ee;
+  color: var(--green-dk);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #c8e0d0;
+}
+
+/* ── CONTENT ── */
+.content { padding: 28px 28px; flex: 1; }
+
+/* ── STAT CARDS ── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 24px;
+  border: 1px solid #e8f0ec;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.stat-icon {
+  width: 50px; height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.stat-label { font-size: 12px; color: #6b7280; font-weight: 500; margin-bottom: 4px; }
+.stat-value { font-size: 24px; font-weight: 700; color: #111; line-height: 1; }
+.stat-sub   { font-size: 12px; color: #9ca3af; margin-top: 3px; }
+
+/* ── ADMIN TABLE ── */
+.admin-table-wrap {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8f0ec;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.table-top {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e8f0ec;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.table-top h2 { font-size: 15px; font-weight: 600; color: #111; flex: 1; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.admin-table th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #6b7280;
+  background: #f9fdfb;
+  border-bottom: 1px solid #e8f0ec;
+}
+.admin-table td { padding: 12px 16px; border-bottom: 1px solid #f0f4f1; color: #374151; vertical-align: middle; }
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: #f9fdfb; }
+
+/* Badges */
+.badge-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-pending   { background:#fef3c7; color:#92400e; }
+.badge-completed { background:#d1fae5; color:#065f46; }
+.badge-failed    { background:#fee2e2; color:#991b1b; }
+.badge-active    { background:#d1fae5; color:#065f46; }
+.badge-inactive  { background:#f3f4f6; color:#6b7280; }
+.badge-unread    { background:#fef3c7; color:#92400e; }
+.badge-read      { background:#f3f4f6; color:#6b7280; }
+.badge-cat       { background:#e8f5ee; color:#1a7a4a; }
+
+/* Action buttons */
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-edit   { background:#e8f5ee; color:#1a7a4a; }
+.btn-edit:hover   { background:#1a7a4a; color:#fff; }
+.btn-delete { background:#fee2e2; color:#991b1b; }
+.btn-delete:hover { background:#991b1b; color:#fff; }
+.btn-view   { background:#e6f1fb; color:#185fa5; }
+.btn-view:hover   { background:#185fa5; color:#fff; }
+.btn-read   { background:#fef3c7; color:#92400e; }
+.btn-read:hover   { background:#92400e; color:#fff; }
+
+/* Form card */
+.form-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e8f0ec;
+  padding: 28px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  max-width: 720px;
+}
+.form-label { font-size: 13px; font-weight: 600; color: #374151; }
+.form-control, .form-select {
+  border-radius: 10px;
+  border: 1.5px solid #d1e8d9;
+  font-size: 14px;
+  padding: 9px 14px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(26,122,74,.10);
+}
+.btn-green {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-green:hover { background: var(--green-dk); }
+
+/* Progress bar */
+.mini-progress { height: 6px; background: #e8f0ec; border-radius: 3px; overflow: hidden; width: 100px; }
+.mini-progress-fill { height: 100%; background: var(--green); border-radius: 3px; }
+
+/* Search input */
+.search-input { border-radius: 20px; border: 1.5px solid #d1e8d9; padding: 7px 16px; font-size: 13px; outline: none; }
+.search-input:focus { border-color: var(--green); }
+
+/* Responsive */
+@media(max-width:768px){
+  .sidebar { width: var(--sidebar-collapsed-w); }
+  .sidebar .sidebar-brand span, .sidebar .nav-item span { display: none; }
+  .main-wrap { margin-left: var(--sidebar-collapsed-w); }
+  .content { padding: 16px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+}

@@ -1,0 +1,17 @@
+Options -Indexes
+DirectoryIndex index.php
+
+# Enable rewrite engine
+RewriteEngine On
+
+# ── Block direct access to sensitive files ──
+<FilesMatch "(db\.php|auth\.php|admin-auth\.php|admin-header\.php|admin-footer\.php)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# ── Block .sql file downloads ──
+<FilesMatch "\.sql$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
